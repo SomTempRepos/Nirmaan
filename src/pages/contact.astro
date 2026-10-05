@@ -1,0 +1,43 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { sitePath } from '../lib/urls';
+---
+
+<BaseLayout title="Contact" current="contact">
+  <header class="page-header">
+    <p class="eyebrow">Contact / next step</p>
+    <h1>Start with a real question.</h1>
+  </header>
+  <section class="section prose">
+    <p>
+      For hiring conversations, systems design discussions, or a thoughtful
+      review of the work:
+    </p>
+    <p>
+      <a href="mailto:somnath.jha.official@gmail.com">
+        somnath.jha.official@gmail.com
+      </a>
+    </p>
+    <div class="button-row">
+      <a
+        class="button secondary"
+        href="https://github.com/Somnathjha007"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        GitHub
+      </a>
+      <a
+        class="button secondary"
+        href="https://linkedin.com/in/somnath-jhaa"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        LinkedIn
+      </a>
+      <a class="button secondary" href={sitePath('/work/')}>
+        See the work
+      </a>
+    </div>
+  </section>
+</BaseLayout>

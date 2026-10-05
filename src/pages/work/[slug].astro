@@ -1,0 +1,85 @@
+---
+import { getCollection, render } from 'astro:content';
+import { ArrowLeft, ExternalLink } from '@lucide/astro';
+import VideoEmbed from '../../components/media/VideoEmbed.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { sitePath } from '../../lib/urls';
+
+export async function getStaticPaths() {
+  const projects = await getCollection(
+    'projects',
+    ({ data }) => data.status === 'published',
+  );
+  return projects.map((project) => ({
+    params: { slug: project.id },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+---
+
+<BaseLayout
+  title={project.data.title}
+  current="work"
+  description={project.data.summary}
+>
+  <article class="case-study">
+    <a class="back-link" href={sitePath('/work/')}>
+      <ArrowLeft size={17} aria-hidden="true" /> All work
+    </a>
+    <header class="page-header case-header">
+      <p class="eyebrow">Case study / {project.data.confidentiality}</p>
+      <h1>{project.data.title}</h1>
+      <p class="lede">{project.data.summary}</p>
+      <dl class="project-facts">
+        <div>
+          <dt>Role</dt>
+          <dd>{project.data.role}</dd>
+        </div>
+        <div>
+          <dt>Timeframe</dt>
+          <dd>{project.data.timeframe}</dd>
+        </div>
+        {project.data.outcome && (
+          <div>
+            <dt>Outcome</dt>
+            <dd>{project.data.outcome}</dd>
+          </div>
+        )}
+      </dl>
+      {project.data.stack.length > 0 && (
+        <div class="tag-list" aria-label="Technologies">
+          {project.data.stack.map((item) => (
+            <span class="tag">{item}</span>
+          ))}
+        </div>
+      )}
+      {project.data.links.length > 0 && (
+        <div class="project-links">
+          {project.data.links.map((link) => (
+            <a
+              class="button secondary"
+              href={link.url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {link.label}
+              <ExternalLink size={15} aria-hidden="true" />
+            </a>
+          ))}
+        </div>
+      )}
+    </header>
+    {project.data.videoUrl && (
+      <VideoEmbed
+        src={project.data.videoUrl}
+        title={`${project.data.title} video`}
+      />
+    )}
+    <div class="prose case-prose">
+      <Content />
+    </div>
+  </article>
+</BaseLayout>

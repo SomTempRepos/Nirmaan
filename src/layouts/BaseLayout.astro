@@ -1,0 +1,174 @@
+---
+import {
+  FolderKanban,
+  House,
+  Lightbulb,
+  Mail,
+  Moon,
+  Sun,
+  UserRound,
+} from '@lucide/astro';
+import { sitePath } from '../lib/urls';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  current?: string;
+}
+
+const {
+  title,
+  description = 'Nirmaan is the studio site of Somnath Jha.',
+  current = '',
+} = Astro.props;
+const links = [
+  { href: '/', label: 'Home', key: 'home', Icon: House },
+  { href: '/work/', label: 'Work', key: 'work', Icon: FolderKanban },
+  { href: '/ideas/', label: 'Ideas', key: 'ideas', Icon: Lightbulb },
+  { href: '/about/', label: 'About', key: 'about', Icon: UserRound },
+  { href: '/contact/', label: 'Contact', key: 'contact', Icon: Mail },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#eef3f1" />
+    <title>{title} · Nirmaan</title>
+    <script is:inline>
+      const themeKey = 'nirmaan-theme';
+      const root = document.documentElement;
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)');
+      let preference = null;
+
+      try {
+        const savedTheme = localStorage.getItem(themeKey);
+        if (savedTheme === 'light' || savedTheme === 'dark')
+          preference = savedTheme;
+      } catch {
+        preference = null;
+      }
+
+      const currentTheme =
+        preference || (systemTheme.matches ? 'dark' : 'light');
+      if (preference) root.dataset.theme = preference;
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      themeColor?.setAttribute(
+        'content',
+        currentTheme === 'dark' ? '#121b1d' : '#eef3f1',
+      );
+      root.dataset.themeReady = 'true';
+
+      document.addEventListener('DOMContentLoaded', () => {
+        const toggle = document.querySelector('[data-theme-toggle]');
+        const syncToggle = (theme) => {
+          const nextTheme = theme === 'dark' ? 'light' : 'dark';
+          toggle?.setAttribute('aria-pressed', String(theme === 'dark'));
+          toggle?.setAttribute('aria-label', `Switch to ${nextTheme} theme`);
+          toggle?.setAttribute('title', `Switch to ${nextTheme} theme`);
+        };
+        syncToggle(currentTheme);
+
+        toggle?.addEventListener('click', () => {
+          preference =
+            root.dataset.theme === 'dark' ||
+            (!root.dataset.theme && systemTheme.matches)
+              ? 'light'
+              : 'dark';
+          root.dataset.theme = preference;
+          syncToggle(preference);
+          themeColor?.setAttribute(
+            'content',
+            preference === 'dark' ? '#121b1d' : '#eef3f1',
+          );
+          try {
+            localStorage.setItem(themeKey, preference);
+          } catch {
+            root.dataset.theme = preference;
+          }
+        });
+
+        systemTheme.addEventListener('change', (event) => {
+          if (preference) return;
+          const theme = event.matches ? 'dark' : 'light';
+          root.removeAttribute('data-theme');
+          syncToggle(theme);
+          themeColor?.setAttribute(
+            'content',
+            theme === 'dark' ? '#121b1d' : '#eef3f1',
+          );
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="header-inner">
+        <a class="wordmark" href={sitePath('/')} aria-label="Nirmaan home">
+          Nirmaan <small>by Somnath Jha</small>
+        </a>
+        <div class="header-actions">
+          <nav class="desktop-nav" aria-label="Primary navigation">
+            {links.map(({ href, label, key, Icon }) => (
+              <a
+                href={sitePath(href)}
+                aria-current={current === key ? 'page' : undefined}
+              >
+                <Icon size={17} stroke-width={1.8} aria-hidden="true" />
+                <span>{label}</span>
+              </a>
+            ))}
+          </nav>
+          <button
+            class="theme-toggle"
+            type="button"
+            data-theme-toggle
+            aria-label="Switch to dark theme"
+            aria-pressed="false"
+            title="Switch to dark theme"
+          >
+            <Moon
+              class="theme-icon-moon"
+              size={19}
+              stroke-width={1.8}
+              aria-hidden="true"
+            />
+            <Sun
+              class="theme-icon-sun"
+              size={19}
+              stroke-width={1.8}
+              aria-hidden="true"
+            />
+          </button>
+        </div>
+      </div>
+    </header>
+    <main class="page">
+      <slot />
+    </main>
+    <footer class="footer">
+      <div class="footer-inner">
+        <strong>Nirmaan</strong>
+        <span>Proof over promises. Built in public, where possible.</span>
+      </div>
+    </footer>
+    <nav class="mobile-tabs" aria-label="Mobile navigation">
+      {links.map(({ href, label, key, Icon }) => (
+        <a
+          href={sitePath(href)}
+          aria-current={current === key ? 'page' : undefined}
+        >
+          <Icon size={19} stroke-width={1.8} aria-hidden="true" />
+          <span>{label}</span>
+        </a>
+      ))}
+    </nav>
+  </body>
+</html>
