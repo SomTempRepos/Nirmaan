@@ -1,0 +1,75 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { publishedIdeas, publishedProjects } from '../../lib/content';
+import { sitePath } from '../../lib/urls';
+
+const ideas = publishedIdeas(await getCollection('ideas'));
+const projects = publishedProjects(await getCollection('projects'));
+const renderedIdeas = await Promise.all(
+  ideas.map(async (idea) => ({
+    idea,
+    Content: (await render(idea)).Content,
+    relatedProjects: projects.filter((project) =>
+      idea.data.relatedProjects.includes(project.id),
+    ),
+  })),
+);
+---
+
+<BaseLayout
+  title="Ideas"
+  current="ideas"
+  description="Short notes on systems, engineering decisions, and things learned while building."
+>
+  <header class="page-header">
+    <p class="eyebrow">Ideas / notes</p>
+    <h1>Small notes from the work.</h1>
+    <p class="lede">
+      Short observations about systems, engineering decisions, and lessons worth
+      keeping.
+    </p>
+  </header>
+  <section class="section idea-list" aria-label="Published ideas">
+    {renderedIdeas.length ? (
+      renderedIdeas.map(({ idea, Content, relatedProjects }) => (
+        <article class="idea-entry">
+          <div class="meta">
+            <time datetime={idea.data.date.toISOString()}>
+              {idea.data.date.toLocaleDateString('en', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                timeZone: 'UTC',
+              })}
+            </time>
+          </div>
+          <h2>{idea.data.title}</h2>
+          <p class="idea-excerpt">{idea.data.excerpt}</p>
+          <div class="prose">
+            <Content />
+          </div>
+          {idea.data.tags.length > 0 && (
+            <div class="tag-list">
+              {idea.data.tags.map((tag) => (
+                <span class="tag">{tag}</span>
+              ))}
+            </div>
+          )}
+          {relatedProjects.length > 0 && (
+            <p class="idea-related">
+              Related work:{' '}
+              {relatedProjects.map((project) => (
+                <a href={sitePath(`/work/${project.id}/`)}>
+                  {project.data.title}
+                </a>
+              ))}
+            </p>
+          )}
+        </article>
+      ))
+    ) : (
+      <p class="empty-state">No public notes yet.</p>
+    )}
+  </section>
+</BaseLayout>

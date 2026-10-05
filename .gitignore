@@ -1,3 +1,10 @@
+# Local AI agent setup
+CLAUDE.md
+CLAUDE.local.md
+AGENTS.md
+.claude/
+.astro/
+
 # Logs
 logs
 *.log
@@ -69,6 +76,9 @@ web_modules/
 .env
 .env.*
 !.env.example
+
+# Private source resume; publish only a separately reviewed export if approved.
+docs/ai_dev_13_5.docx
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache

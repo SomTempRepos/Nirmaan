@@ -1,0 +1,20 @@
+---
+import type { ProjectEntry } from '../../lib/content';
+import { sitePath } from '../../lib/urls';
+
+interface Props {
+  project: ProjectEntry;
+}
+
+const { project } = Astro.props;
+---
+
+<a class="work-card" href={sitePath(`/work/${project.id}/`)}>
+  <div class="meta">
+    <span>{project.data.confidentiality}</span>
+    <span>{project.data.timeframe}</span>
+  </div>
+  <h3>{project.data.title}</h3>
+  <p>{project.data.summary}</p>
+  <span class="text-link">Read the case study</span>
+</a>

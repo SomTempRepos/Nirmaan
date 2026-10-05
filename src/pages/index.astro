@@ -1,0 +1,160 @@
+---
+import { getCollection } from 'astro:content';
+import ProjectCard from '../components/content/ProjectCard.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { publishedIdeas, publishedProjects } from '../lib/content';
+import { sitePath } from '../lib/urls';
+
+const projects = publishedProjects(await getCollection('projects'));
+const featuredProjects = projects
+  .filter((project) => project.data.featured)
+  .slice(0, 2);
+const selectedProjects = (
+  featuredProjects.length ? featuredProjects : projects
+).slice(0, 2);
+const recentIdeas = publishedIdeas(await getCollection('ideas')).slice(0, 3);
+---
+
+<BaseLayout
+  title="Backend and AI systems"
+  current="home"
+  description="Nirmaan is the studio site of Somnath Jha, focused on backend and AI systems engineering."
+>
+  <section class="hero">
+    <div>
+      <p class="eyebrow">Nirmaan / studio log</p>
+      <h1>Systems that hold their shape under pressure.</h1>
+      <p class="lede">
+        Backend and AI systems engineering, documented through the problems,
+        constraints, and decisions behind the work.
+      </p>
+      <div class="button-row">
+        <a class="button" href={sitePath('/work/')}>
+          Read the work
+        </a>
+        <a class="button secondary" href={sitePath('/contact/')}>
+          Get in touch
+        </a>
+      </div>
+    </div>
+    <aside
+      class="trace"
+      aria-label="A request trace showing the studio's working method"
+    >
+      <div class="trace-head">
+        <span>REQUEST_TRACE</span>
+        <span>v0.1</span>
+      </div>
+      <ol class="trace-list">
+        <li class="trace-item">
+          <i class="trace-dot"></i>
+          <div>
+            <strong>Find the constraint</strong>
+            <span>problem / boundary</span>
+          </div>
+        </li>
+        <li class="trace-item">
+          <i class="trace-dot"></i>
+          <div>
+            <strong>Make the trade-off</strong>
+            <span>decision / cost</span>
+          </div>
+        </li>
+        <li class="trace-item">
+          <i class="trace-dot"></i>
+          <div>
+            <strong>Show the evidence</strong>
+            <span>system / outcome</span>
+          </div>
+        </li>
+      </ol>
+    </aside>
+  </section>
+  <section class="section" aria-labelledby="selected-work">
+    <div class="section-heading">
+      <h2 id="selected-work">Selected work</h2>
+      <a class="text-link" href={sitePath('/work/')}>
+        All projects
+      </a>
+    </div>
+    {selectedProjects.length ? (
+      <div class="work-grid">
+        {selectedProjects.map((project) => (
+          <ProjectCard project={project} />
+        ))}
+      </div>
+    ) : (
+      <p class="empty-state">
+        Project case studies will appear here once they are cleared for
+        publication.
+      </p>
+    )}
+  </section>
+  <section class="section" aria-labelledby="working-areas">
+    <div class="section-heading">
+      <h2 id="working-areas">Working areas</h2>
+      <p class="section-note">
+        The systems vocabulary behind the work. Specific tools belong in each
+        case study, where they have context.
+      </p>
+    </div>
+    <div class="area-list">
+      <div class="area-row">
+        <span class="area-index">01</span>
+        <strong>Backend systems</strong>
+        <span>APIs / state / failure modes</span>
+      </div>
+      <div class="area-row">
+        <span class="area-index">02</span>
+        <strong>AI systems</strong>
+        <span>inference / evaluation / retrieval</span>
+      </div>
+      <div class="area-row">
+        <span class="area-index">03</span>
+        <strong>Systems thinking</strong>
+        <span>constraints / trade-offs / evidence</span>
+      </div>
+    </div>
+  </section>
+  {recentIdeas.length > 0 && (
+    <section class="section" aria-labelledby="recent-ideas">
+      <div class="section-heading">
+        <h2 id="recent-ideas">Recent ideas</h2>
+        <a class="text-link" href={sitePath('/ideas/')}>
+          All notes
+        </a>
+      </div>
+      <div class="idea-preview-list">
+        {recentIdeas.map((idea) => (
+          <article class="idea-preview">
+            <time class="meta" datetime={idea.data.date.toISOString()}>
+              {idea.data.date.toLocaleDateString('en', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                timeZone: 'UTC',
+              })}
+            </time>
+            <h3>{idea.data.title}</h3>
+            <p>{idea.data.excerpt}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+  )}
+  <section class="section contact-strip" aria-labelledby="open-conversation">
+    <div>
+      <p class="eyebrow">Next request</p>
+      <h2 id="open-conversation">Have a system worth thinking through?</h2>
+    </div>
+    <div>
+      <p class="section-note">
+        For hiring conversations and serious engineering questions, start with
+        the problem.
+      </p>
+      <a class="button" href={sitePath('/contact/')}>
+        Open a conversation
+      </a>
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,39 @@
+---
+import { getCollection } from 'astro:content';
+import ProjectCard from '../../components/content/ProjectCard.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { publishedProjects } from '../../lib/content';
+
+const projects = publishedProjects(await getCollection('projects'));
+---
+
+<BaseLayout
+  title="Work"
+  current="work"
+  description="Selected project case studies and supporting evidence by Somnath Jha."
+>
+  <header class="page-header">
+    <p class="eyebrow">Work / evidence</p>
+    <h1>Projects, with the reasoning left in.</h1>
+    <p class="lede">
+      Each project starts with the problem and constraints, then shows the
+      decisions and evidence behind the work.
+    </p>
+  </header>
+  <section class="section" aria-labelledby="project-list-heading">
+    <div class="section-heading">
+      <h2 id="project-list-heading">Selected work</h2>
+    </div>
+    {projects.length ? (
+      <div class="work-grid">
+        {projects.map((project) => (
+          <ProjectCard project={project} />
+        ))}
+      </div>
+    ) : (
+      <p class="empty-state">
+        No projects are published yet. Cleared case studies will appear here.
+      </p>
+    )}
+  </section>
+</BaseLayout>
